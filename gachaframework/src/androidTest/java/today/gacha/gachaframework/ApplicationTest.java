@@ -1,4 +1,4 @@
-package org.nextinnovation.nextframework;
+package today.gacha.gachaframework;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

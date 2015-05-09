@@ -4,18 +4,16 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
 import android.util.Log;
-import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import today.gacha.gachaframework.GachaFragmentActivity;
 
-public class MapsActivity extends FragmentActivity {
+public class MapsActivity extends GachaFragmentActivity {
 
 	private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
