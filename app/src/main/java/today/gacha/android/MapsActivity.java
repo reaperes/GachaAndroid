@@ -11,11 +11,11 @@ public class MapsActivity extends GachaFragmentActivity implements LocationActiv
 	private MapActivityService mapActivityService;
 
 	{
-		locationActivityService = LocationActivityService.with(this).getService();
 		mapActivityService = MapActivityService.with(this).mapFragmentId(R.id.map).getService();
+		locationActivityService = LocationActivityService.with(this).getService();
 
-		registerActivityService(locationActivityService);
 		registerActivityService(mapActivityService);
+		registerActivityService(locationActivityService);
 	}
 
 	@Override

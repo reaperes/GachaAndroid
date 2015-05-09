@@ -38,6 +38,10 @@ public class MapActivityService extends AbstractActivityService {
 		});
 	}
 
+	// ------------------------------------------------------------------------
+	// Abstract activity service
+	// ------------------------------------------------------------------------
+
 	@Override
 	public void onPostCreating() {
 		setUpMapIfNeeded();

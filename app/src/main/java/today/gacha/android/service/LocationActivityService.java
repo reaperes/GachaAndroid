@@ -40,6 +40,11 @@ public class LocationActivityService extends AbstractActivityService implements 
 	public void onPostCreating() {
 		LocationManager locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, updateMinTime, updateMinDistance, this);
+
+		Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		if (lastLocation != null) {
+			onLocationChanged(lastLocation);
+		}
 	}
 
 	// ------------------------------------------------------------------------
