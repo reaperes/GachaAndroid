@@ -30,6 +30,8 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
 		LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		LocationListener mlocListener = new MyLocationListener();
 		mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000L, 0F, mlocListener);
+		Location curLoc = mlocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		Log.w("nhk", String.valueOf(curLoc.getLatitude()));
 	}
 
 	@Override
