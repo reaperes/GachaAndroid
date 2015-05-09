@@ -17,7 +17,13 @@ public class GachaFragmentActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 
 		for (ActivityService activityService : activityServices) {
-			activityService.onCreate(savedInstanceState);
+			activityService.onPreCreating();
+		}
+
+		onCreating(savedInstanceState);
+
+		for (ActivityService activityService : activityServices) {
+			activityService.onPostCreating();
 		}
 	}
 
@@ -26,7 +32,13 @@ public class GachaFragmentActivity extends FragmentActivity {
 		super.onStart();
 
 		for (ActivityService activityService : activityServices) {
-			activityService.onStart();
+			activityService.onPreStarting();
+		}
+
+		onStarting();
+
+		for (ActivityService activityService : activityServices) {
+			activityService.onPostStarting();
 		}
 	}
 
@@ -35,7 +47,13 @@ public class GachaFragmentActivity extends FragmentActivity {
 		super.onRestart();
 
 		for (ActivityService activityService : activityServices) {
-			activityService.onRestart();
+			activityService.onPreRestarting();
+		}
+
+		onRestarting();
+
+		for (ActivityService activityService : activityServices) {
+			activityService.onPostRestarting();
 		}
 	}
 
@@ -44,7 +62,13 @@ public class GachaFragmentActivity extends FragmentActivity {
 		super.onResume();
 
 		for (ActivityService activityService : activityServices) {
-			activityService.onResume();
+			activityService.onPreResuming();
+		}
+
+		onResuming();
+
+		for (ActivityService activityService : activityServices) {
+			activityService.onPostResuming();
 		}
 	}
 
@@ -53,7 +77,13 @@ public class GachaFragmentActivity extends FragmentActivity {
 		super.onPause();
 
 		for (ActivityService activityService : activityServices) {
-			activityService.onPause();
+			activityService.onPrePausing();
+		}
+
+		onPausing();
+
+		for (ActivityService activityService : activityServices) {
+			activityService.onPostPausing();
 		}
 	}
 
@@ -62,7 +92,13 @@ public class GachaFragmentActivity extends FragmentActivity {
 		super.onStop();
 
 		for (ActivityService activityService : activityServices) {
-			activityService.onStop();
+			activityService.onPreStopping();
+		}
+
+		onStopping();
+
+		for (ActivityService activityService : activityServices) {
+			activityService.onPostStopping();
 		}
 	}
 
@@ -71,8 +107,35 @@ public class GachaFragmentActivity extends FragmentActivity {
 		super.onDestroy();
 
 		for (ActivityService activityService : activityServices) {
-			activityService.onDestroy();
+			activityService.onPreDestroying();
 		}
+
+		onDestroying();
+
+		for (ActivityService activityService : activityServices) {
+			activityService.onPostDestroying();
+		}
+	}
+
+	protected void onCreating(Bundle savedInstanceState) {
+	}
+
+	protected void onStarting() {
+	}
+
+	protected void onRestarting() {
+	}
+
+	protected void onResuming() {
+	}
+
+	protected void onPausing() {
+	}
+
+	protected void onStopping() {
+	}
+
+	protected void onDestroying() {
 	}
 
 	public void registerActivityService(ActivityService activityService) {

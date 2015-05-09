@@ -37,7 +37,7 @@ public class LocationActivityService extends AbstractActivityService implements 
 	// ------------------------------------------------------------------------
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onPostCreating() {
 		LocationManager locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, updateMinTime, updateMinDistance, this);
 	}

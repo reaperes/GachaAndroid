@@ -19,14 +19,9 @@ public class MapsActivity extends GachaFragmentActivity implements LocationActiv
 	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	protected void onCreating(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_maps);
-	}
 
-	@Override
-	protected void onStart() {
-		super.onStart();
 		locationActivityService.setLocationChangedListener(this);
 	}
 

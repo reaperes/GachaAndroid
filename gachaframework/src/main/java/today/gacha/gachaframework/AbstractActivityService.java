@@ -1,36 +1,62 @@
 package today.gacha.gachaframework;
 
-import android.os.Bundle;
-
 /**
  * @author Namhoon
  */
-public class AbstractActivityService implements ActivityService {
+public abstract class AbstractActivityService implements ActivityService {
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onPreCreating() {
 	}
 
 	@Override
-	public void onStart() {
+	public void onPostCreating() {
 	}
 
 	@Override
-	public void onRestart() {
+	public void onPreStarting() {
 	}
 
 	@Override
-	public void onResume() {
+	public void onPostStarting() {
 	}
 
 	@Override
-	public void onPause() {
+	public void onPreRestarting() {
 	}
 
 	@Override
-	public void onStop() {
+	public void onPostRestarting() {
 	}
 
 	@Override
-	public void onDestroy() {
+	public void onPreResuming() {
+	}
+
+	@Override
+	public void onPostResuming() {
+	}
+
+	@Override
+	public void onPrePausing() {
+	}
+
+	@Override
+	public void onPostPausing() {
+	}
+
+	@Override
+	public void onPreStopping() {
+	}
+
+	@Override
+	public void onPostStopping() {
+	}
+
+	@Override
+	public void onPreDestroying() {
+	}
+
+	@Override
+	public void onPostDestroying() {
 	}
 }

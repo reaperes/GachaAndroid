@@ -39,7 +39,7 @@ public class MapActivityService extends AbstractActivityService {
 	}
 
 	@Override
-	public void onStart() {
+	public void onPostCreating() {
 		setUpMapIfNeeded();
 	}
 

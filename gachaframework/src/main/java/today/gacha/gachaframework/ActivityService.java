@@ -1,22 +1,27 @@
 package today.gacha.gachaframework;
 
-import android.os.Bundle;
-
 /**
  * @author Namhoon
  */
 public interface ActivityService {
-	void onCreate(Bundle savedInstanceState);
+	void onPreCreating();
+	void onPostCreating();
 
-	void onStart();
+	void onPreStarting();
+	void onPostStarting();
 
-	void onRestart();
+	void onPreRestarting();
+	void onPostRestarting();
 
-	void onResume();
+	void onPreResuming();
+	void onPostResuming();
 
-	void onPause();
+	void onPrePausing();
+	void onPostPausing();
 
-	void onStop();
+	void onPreStopping();
+	void onPostStopping();
 
-	void onDestroy();
+	void onPreDestroying();
+	void onPostDestroying();
 }
