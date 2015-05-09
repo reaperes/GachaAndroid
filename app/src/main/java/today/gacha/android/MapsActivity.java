@@ -9,6 +9,7 @@ import android.os.Bundle;
 
 import android.util.Log;
 import android.widget.Toast;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -24,9 +25,9 @@ public class MapsActivity extends FragmentActivity {
 		setContentView(R.layout.activity_maps);
 		setUpMapIfNeeded();
 
-		LocationManager mlocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+		LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		LocationListener mlocListener = new MyLocationListener();
-		mlocManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 5000L, 0, mlocListener);
+		mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000L, 0, mlocListener);
 	}
 
 	@Override
@@ -70,41 +71,44 @@ public class MapsActivity extends FragmentActivity {
 	 * This should only be called once and when we are sure that {@link #mMap} is not null.
 	 */
 	private void setUpMap() {
-//		mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+		//		mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
 	}
 
-	public class MyLocationListener implements LocationListener
-	{
+	public class MyLocationListener implements LocationListener {
 		@Override
-		public void onLocationChanged(Location loc)
-		{
+		public void onLocationChanged(final Location location) {
 
-			loc.getLatitude();
-			loc.getLongitude();
+			LatLng newLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newLatLng, 14f), 200, new GoogleMap.CancelableCallback() {
+				@Override
+				public void onFinish() {
+					//DO some stuff here!
+					Log.d("animation", "onFinishCalled");
+				}
 
-			String Text = "My current location is: " +
-				"Latitud = " + loc.getLatitude() +
-				"Longitud = " + loc.getLongitude();
-
-			mMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())).title("Marker"));
-			Toast.makeText(getApplicationContext(), Text, Toast.LENGTH_SHORT).show();
+				@Override
+				public void onCancel() {
+					Log.d("animation", "onCancel");
+				}
+			});
+			//			mMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())).title("Marker"));
+			//			Toast.makeText(getApplicationContext(), Text, Toast.LENGTH_SHORT).show();
 		}
 
 		@Override
-		public void onProviderDisabled(String provider)
-		{
-			Toast.makeText( getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT ).show();
+		public void onProviderDisabled(String provider) {
+			//			Toast.makeText( getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT ).show();
+			Log.w("nhk", "Gps Disabled");
 		}
 
 		@Override
-		public void onProviderEnabled(String provider)
-		{
-			Toast.makeText( getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
+		public void onProviderEnabled(String provider) {
+			Log.w("nhk", "Gps Enabled");
+			//			Toast.makeText( getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
 		}
 
 		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras)
-		{
+		public void onStatusChanged(String provider, int status, Bundle extras) {
 			Log.w("nhk", "provider = " + provider + ", status = " + String.valueOf(status));
 		}
 	}
