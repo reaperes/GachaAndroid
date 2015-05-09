@@ -9,14 +9,12 @@ import android.os.Bundle;
 
 import android.util.Log;
 import android.widget.Toast;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks {
+public class MapsActivity extends FragmentActivity {
 
 	private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
@@ -24,20 +22,17 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_maps);
-		//		setUpMapIfNeeded();
-		buildGoogleApiClient();
+		setUpMapIfNeeded();
 
-		LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		LocationManager mlocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 		LocationListener mlocListener = new MyLocationListener();
-		mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000L, 0F, mlocListener);
-		Location curLoc = mlocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		Log.w("nhk", String.valueOf(curLoc.getLatitude()));
+		mlocManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 5000L, 0, mlocListener);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		//		setUpMapIfNeeded();
+		setUpMapIfNeeded();
 	}
 
 	/**
@@ -75,60 +70,41 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
 	 * This should only be called once and when we are sure that {@link #mMap} is not null.
 	 */
 	private void setUpMap() {
-		//		mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+//		mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
 	}
 
-	private GoogleApiClient mGoogleApiClient;
-
-	protected synchronized void buildGoogleApiClient() {
-		mGoogleApiClient = new GoogleApiClient.Builder(this)
-			.addConnectionCallbacks(this)
-//			.addOnConnectionFailedListener(this)
-			.addApi(LocationServices.API)
-			.build();
-	}
-
-	private Location mLastLocation;
-
-	@Override
-	public void onConnected(Bundle connectionHint) {
-		mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-			mGoogleApiClient);
-		if (mLastLocation != null) {
-			Log.w("nhk", String.valueOf(mLastLocation.getLatitude()));
-			Log.w("nhk", String.valueOf(mLastLocation.getLongitude()));
-		}
-	}
-
-	@Override public void onConnectionSuspended(int i) {
-	}
-
-	public class MyLocationListener implements LocationListener {
+	public class MyLocationListener implements LocationListener
+	{
 		@Override
-		public void onLocationChanged(Location loc) {
+		public void onLocationChanged(Location loc)
+		{
+
 			loc.getLatitude();
 			loc.getLongitude();
 
 			String Text = "My current location is: " +
-				"Latitude = " + loc.getLatitude() +
-				"Longitude = " + loc.getLongitude();
+				"Latitud = " + loc.getLatitude() +
+				"Longitud = " + loc.getLongitude();
 
 			mMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())).title("Marker"));
 			Toast.makeText(getApplicationContext(), Text, Toast.LENGTH_SHORT).show();
 		}
 
 		@Override
-		public void onProviderDisabled(String provider) {
-			Toast.makeText(getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT).show();
+		public void onProviderDisabled(String provider)
+		{
+			Toast.makeText( getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT ).show();
 		}
 
 		@Override
-		public void onProviderEnabled(String provider) {
-			Toast.makeText(getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
+		public void onProviderEnabled(String provider)
+		{
+			Toast.makeText( getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
 		}
 
 		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras) {
+		public void onStatusChanged(String provider, int status, Bundle extras)
+		{
 			Log.w("nhk", "provider = " + provider + ", status = " + String.valueOf(status));
 		}
 	}
