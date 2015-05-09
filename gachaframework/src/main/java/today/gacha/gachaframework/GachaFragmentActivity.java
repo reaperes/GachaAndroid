@@ -10,14 +10,14 @@ import java.util.List;
  * @author Namhoon
  */
 public class GachaFragmentActivity extends FragmentActivity {
-	private List<Service> services = new ArrayList<>();
+	private List<ActivityService> activityServices = new ArrayList<>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		for (Service service : services) {
-			service.onCreate(savedInstanceState);
+		for (ActivityService activityService : activityServices) {
+			activityService.onCreate(savedInstanceState);
 		}
 	}
 
@@ -25,8 +25,8 @@ public class GachaFragmentActivity extends FragmentActivity {
 	protected void onStart() {
 		super.onStart();
 
-		for (Service service : services) {
-			service.onStart();
+		for (ActivityService activityService : activityServices) {
+			activityService.onStart();
 		}
 	}
 
@@ -34,8 +34,8 @@ public class GachaFragmentActivity extends FragmentActivity {
 	protected void onRestart() {
 		super.onRestart();
 
-		for (Service service : services) {
-			service.onRestart();
+		for (ActivityService activityService : activityServices) {
+			activityService.onRestart();
 		}
 	}
 
@@ -43,8 +43,8 @@ public class GachaFragmentActivity extends FragmentActivity {
 	protected void onResume() {
 		super.onResume();
 
-		for (Service service : services) {
-			service.onResume();
+		for (ActivityService activityService : activityServices) {
+			activityService.onResume();
 		}
 	}
 
@@ -52,8 +52,8 @@ public class GachaFragmentActivity extends FragmentActivity {
 	protected void onPause() {
 		super.onPause();
 
-		for (Service service : services) {
-			service.onPause();
+		for (ActivityService activityService : activityServices) {
+			activityService.onPause();
 		}
 	}
 
@@ -61,8 +61,8 @@ public class GachaFragmentActivity extends FragmentActivity {
 	protected void onStop() {
 		super.onStop();
 
-		for (Service service : services) {
-			service.onStop();
+		for (ActivityService activityService : activityServices) {
+			activityService.onStop();
 		}
 	}
 
@@ -70,16 +70,16 @@ public class GachaFragmentActivity extends FragmentActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 
-		for (Service service : services) {
-			service.onDestroy();
+		for (ActivityService activityService : activityServices) {
+			activityService.onDestroy();
 		}
 	}
 
-	public void registerService(Service service) {
-		services.add(service);
+	public void registerActivityService(ActivityService activityService) {
+		activityServices.add(activityService);
 	}
 
-	public void removeService(Service service) {
-		services.remove(service);
+	public void removeActivityService(ActivityService activityService) {
+		activityServices.remove(activityService);
 	}
 }

@@ -5,7 +5,7 @@ import android.os.Bundle;
 /**
  * @author Namhoon
  */
-public interface Service {
+public interface ActivityService {
 	void onCreate(Bundle savedInstanceState);
 
 	void onStart();
