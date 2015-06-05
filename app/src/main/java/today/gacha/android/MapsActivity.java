@@ -40,7 +40,6 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		URQAController.InitializeAndStartSession(getApplicationContext(), "C3AC5133");
 
 		setContentView(R.layout.activity_maps);
 
