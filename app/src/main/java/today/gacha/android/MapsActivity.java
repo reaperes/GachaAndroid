@@ -15,6 +15,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.urqa.clientinterface.URQAController;
 
 /**
  * Activity step
@@ -23,7 +24,7 @@ import com.google.android.gms.maps.model.LatLng;
  * 2. Get user's last location.
  */
 public class MapsActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,
-	GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMapClickListener {
+	GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
 	private static final String TAG = MapsActivity.class.getSimpleName();
 
@@ -39,13 +40,11 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		URQAController.InitializeAndStartSession(getApplicationContext(), "C3AC5133");
 
 		setContentView(R.layout.activity_maps);
 
 		setUpMapIfNeeded();
-		googleMap.setOnMapClickListener(this);
-
-
 		buildGoogleApiClient();
 	}
 
@@ -65,11 +64,11 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
 
 	@Override
 	public void onConnected(Bundle bundle) {
-		Log.e(TAG, "onConnected");
+		Log.d(TAG, "Google api service has connected.");
 
 		int state = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-		if (state == ConnectionResult.SUCCESS) {
-			Log.e(TAG, "PlayService is SUCCESS");
+		if (state != ConnectionResult.SUCCESS) {
+			crashAndReportConnectionResult(state);
 		}
 
 		mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
@@ -83,7 +82,7 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
 				.zoom(14.5f).build();
 
 			Log.e(TAG, "Move camera to lat : " + String.valueOf(latitude) + ", lng : " + String.valueOf(longitude));
-				googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+			googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 		} else {
 			Log.e(TAG, "Request location update");
 
@@ -117,12 +116,7 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
 		Log.e(TAG, "onConnectionFailed");
 	}
 
-	@Override
-	public void onMapClick(LatLng latLng) {
-		Log.e(TAG, "Lat : " + String.valueOf(latLng.latitude) + ", Lng : " + String.valueOf(latLng.longitude));
-	}
-
-	private synchronized void buildGoogleApiClient() {
+	private void buildGoogleApiClient() {
 		mGoogleApiClient = new GoogleApiClient.Builder(this)
 			.addConnectionCallbacks(this)
 			.addOnConnectionFailedListener(this)
@@ -134,6 +128,50 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
 		if (googleMap == null) {
 			googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
 			googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(NHN_NEXT, NHN_NEXT_ZOOM));
+		}
+	}
+
+	private void crashAndReportConnectionResult(int state) {
+		throw new AssertionError(
+			"Google api service can not connected. Connection result state - "
+				+ GooglePlayConnectionResult.find(state).name());
+	}
+
+	private enum GooglePlayConnectionResult {
+		SUCCESS(0),
+		SERVICE_MISSING(1),
+		SERVICE_VERSION_UPDATE_REQUIRED(2),
+		SERVICE_DISABLED(3),
+		SIGN_IN_REQUIRED(4),
+		INVALID_ACCOUNT(5),
+		RESOLUTION_REQUIRED(6),
+		NETWORK_ERROR(7),
+		INTERNAL_ERROR(8),
+		SERVICE_INVALID(9),
+		DEVELOPER_ERROR(10),
+		LICENSE_CHECK_FAILED(11),
+		CANCELED(13),
+		TIMEOUT(14),
+		INTERRUPTED(15),
+		API_UNAVAILABLE(16),
+		SIGN_IN_FAILED(17),
+		SERVICE_UPDATING(18),
+
+		CAN_NOT_FIND_STATE_CODE(999);
+
+		int state;
+
+		GooglePlayConnectionResult(int state) {
+			this.state = state;
+		}
+
+		private static GooglePlayConnectionResult find(int state) {
+			for (GooglePlayConnectionResult element : values()) {
+				if (element.state == state) {
+					return element;
+				}
+			}
+			return CAN_NOT_FIND_STATE_CODE;
 		}
 	}
 }
