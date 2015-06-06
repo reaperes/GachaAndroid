@@ -2,13 +2,13 @@ package today.gacha.android.ui;
 
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import today.gacha.android.core.ExtendedFragmentActivity;
 import today.gacha.android.R;
 import today.gacha.android.service.GachaLocationService;
 import today.gacha.android.service.GachaLocationService.FailReason;
@@ -21,7 +21,7 @@ import today.gacha.android.service.GachaLocationService.LocationCallback;
  * 2. Get user's last location.
  * 3. Get user's current location.
  */
-public class MapsActivity extends FragmentActivity {
+public class MapsActivity extends ExtendedFragmentActivity {
 
 	private static final String TAG = MapsActivity.class.getSimpleName();
 
@@ -52,7 +52,7 @@ public class MapsActivity extends FragmentActivity {
 			public void onCompleted(Location location, FailReason reason) {
 				if (location != null) {
 					animateGoogleMapCamera(location);
-					return ;
+					return;
 				}
 				Log.d(TAG, "Get last location failed - " + reason.getMessage());
 
@@ -61,7 +61,7 @@ public class MapsActivity extends FragmentActivity {
 					public void onCompleted(Location location, FailReason reason) {
 						if (location != null) {
 							animateGoogleMapCamera(location);
-							return ;
+							return;
 						}
 						Log.w(TAG, "Requet current location failed - " + reason.getMessage());
 					}
@@ -72,9 +72,9 @@ public class MapsActivity extends FragmentActivity {
 
 	private void animateGoogleMapCamera(Location lastLocation) {
 		CameraPosition cameraPosition = new CameraPosition.Builder()
-			.target(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()))
-			.zoom(DEFAULT_ZOOM_LEVEL)
-			.build();
+				.target(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()))
+				.zoom(DEFAULT_ZOOM_LEVEL)
+				.build();
 
 		Log.d(TAG, "Move google map camera to location - " + lastLocation.toString());
 		googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));

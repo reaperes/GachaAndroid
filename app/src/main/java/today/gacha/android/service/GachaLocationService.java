@@ -11,6 +11,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import today.gacha.android.core.ExtendedFragmentActivity;
+import today.gacha.android.core.ExtendedFragmentActivity.OnActivityPauseListener;
 
 import static com.google.android.gms.common.api.GoogleApiClient.*;
 
@@ -19,7 +21,7 @@ import static com.google.android.gms.common.api.GoogleApiClient.*;
  *
  * @author Namhoon
  */
-public class GachaLocationService {
+public class GachaLocationService implements GachaService, OnActivityPauseListener {
 	private static final String TAG = GachaLocationService.class.getSimpleName();
 
 	static volatile GachaLocationService singleton = null;
@@ -125,6 +127,14 @@ public class GachaLocationService {
 
 	public boolean isGpsEnable() {
 		return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+	}
+
+	@Override
+	public void onActivityPaused() {
+		if (googleApiClient != null) {
+			Log.d(TAG, "Google api client disconnected.");
+			googleApiClient.disconnect();
+		}
 	}
 
 	public enum FailReason {
