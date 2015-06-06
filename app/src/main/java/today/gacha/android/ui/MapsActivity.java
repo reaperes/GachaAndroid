@@ -19,6 +19,7 @@ import today.gacha.android.service.GachaLocationService.LocationCallback;
  *
  * 1. Launch activity with default map position (NHN NEXT).
  * 2. Get user's last location.
+ * 3. Get user's current location.
  */
 public class MapsActivity extends FragmentActivity {
 
