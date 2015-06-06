@@ -100,6 +100,7 @@ public class ExtendedFragmentActivity extends FragmentActivity {
 			extends OnActivityCreateListener,
 			OnActivityStartListener,
 			OnActivityResumeListener,
+			OnActivityPauseListener,
 			OnActivityStopListener,
 			OnActivityDestroyedListener {
 	}
