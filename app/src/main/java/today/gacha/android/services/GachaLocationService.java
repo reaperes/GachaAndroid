@@ -1,4 +1,4 @@
-package today.gacha.android.service;
+package today.gacha.android.services;
 
 import android.content.Context;
 import android.location.Location;
@@ -11,7 +11,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import today.gacha.android.core.ExtendedFragmentActivity;
 import today.gacha.android.core.ExtendedFragmentActivity.OnActivityPauseListener;
 
 import static com.google.android.gms.common.api.GoogleApiClient.*;

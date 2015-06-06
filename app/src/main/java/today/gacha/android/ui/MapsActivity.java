@@ -10,9 +10,9 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import today.gacha.android.core.ExtendedFragmentActivity;
 import today.gacha.android.R;
-import today.gacha.android.service.GachaLocationService;
-import today.gacha.android.service.GachaLocationService.FailReason;
-import today.gacha.android.service.GachaLocationService.LocationCallback;
+import today.gacha.android.services.GachaLocationService;
+import today.gacha.android.services.GachaLocationService.FailReason;
+import today.gacha.android.services.GachaLocationService.LocationCallback;
 
 /**
  * Activity step

@@ -2,7 +2,7 @@ package today.gacha.android.core;
 
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import today.gacha.android.service.GachaService;
+import today.gacha.android.services.GachaService;
 
 import java.util.ArrayList;
 import java.util.List;
