@@ -40,18 +40,20 @@ public class GachaLocationService implements GachaService, ExtendedFragmentActiv
 	 */
 	private State state = State.NotReady;
 
-	private GachaLocationService(Context context) {
-		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-		googleApiClient = new Builder(context.getApplicationContext())
-				.addApi(LocationServices.API)
-				.build();
+	GachaLocationService(LocationManager locationManager, GoogleApiClient googleApiClient) {
+		this.locationManager = locationManager;
+		this.googleApiClient = googleApiClient;
 	}
 
 	public static GachaLocationService getService(Context context) {
 		if (singleton == null) {
 			synchronized (GachaLocationService.class) {
 				if (singleton == null) {
-					singleton = new GachaLocationService(context);
+					LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+					GoogleApiClient googleApiClient = new Builder(context.getApplicationContext())
+							.addApi(LocationServices.API)
+							.build();
+					singleton = new GachaLocationService(locationManager, googleApiClient);
 				}
 			}
 		}
