@@ -10,7 +10,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import today.gacha.android.service.GachaLocationService;
-import today.gacha.android.service.GachaLocationService.LastLocationCallback;
+import today.gacha.android.service.GachaLocationService.FailReason;
+import today.gacha.android.service.GachaLocationService.LocationCallback;
 
 /**
  * Activity step
@@ -44,52 +45,29 @@ public class MapsActivity extends FragmentActivity {
 	protected void onResume() {
 		super.onResume();
 
-		locationService.getLastLocation(new LastLocationCallback() {
+		locationService.getLastLocation(new LocationCallback() {
 			@Override
-			public void onCompleted(Location location, GachaLocationService.FailReason reason) {
-				if (location == null) {
-					Log.e(TAG, "Get last location failed - " + reason.getMessage());
-					return;
+			public void onCompleted(Location location, FailReason reason) {
+				if (location != null) {
+					animateGoogleMapCamera(location);
+					return ;
 				}
+				Log.d(TAG, "Get last location failed - " + reason.getMessage());
 
-				animateGoogleMapCamera(location);
+				locationService.getCurrentLocation(new LocationCallback() {
+					@Override
+					public void onCompleted(Location location, FailReason reason) {
+						if (location != null) {
+							animateGoogleMapCamera(location);
+							return ;
+						}
+						Log.w(TAG, "Requet current location failed - " + reason.getMessage());
+					}
+				});
 			}
 		});
 	}
 
-	//	@Override
-	//	public void onConnected(Bundle bundle) {
-	//		setUpLocationManager();
-	//		if (!isGpsEnable()) {
-	//			Toast.makeText(this, "GPS is not enabled. Please go on settings menu, and switch on GPS.",
-	//				Toast.LENGTH_LONG).show();
-	//			return ;
-	//		}
-	//
-	//		/**
-	//		 * Location request reference
-	//		 * <a href="https://developer.android.com/training/location/receive-location-updates.html">Reference</a>
-	//		 */
-	//		LocationRequest request = new LocationRequest();
-	//		request.setInterval(1000);
-	//		request.setFastestInterval(1000);
-	//		request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-	//		request.setExpirationDuration(10000);	// 10 seconds
-	//		request.setNumUpdates(1);
-	//
-	//		LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request, this);
-	//	}
-	//
-	//	@Override
-	//	public void onLocationChanged(Location location) {
-	//		animateGoogleMapCamera(location);
-	//	}
-	//
-	//
-	//	private void setUpLocationManager() {
-	//		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-	//	}
-	//
 	private void animateGoogleMapCamera(Location lastLocation) {
 		CameraPosition cameraPosition = new CameraPosition.Builder()
 			.target(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()))
@@ -99,20 +77,6 @@ public class MapsActivity extends FragmentActivity {
 		Log.d(TAG, "Move google map camera to location - " + lastLocation.toString());
 		googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 	}
-
-	//	private boolean isGpsEnable() {
-	//		boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-	//		Log.e(TAG, "GPS : " + String.valueOf(gpsEnabled));
-	//
-	//		return gpsEnabled;
-	//	}
-
-	//	private void validateGooglePlayServicesAvailable() {
-	//		int state = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-	//		if (state != ConnectionResult.SUCCESS) {
-	//			crashAndReportConnectionResult(state);
-	//		}
-	//	}
 
 	private void setUpGoogleMap() {
 		if (googleMap == null) {
@@ -127,10 +91,4 @@ public class MapsActivity extends FragmentActivity {
 			});
 		}
 	}
-
-	//	private void crashAndReportConnectionResult(int state) {
-	//		throw new AssertionError(
-	//			"Google api service can not connected. Connection result state - "
-	//				+ GooglePlayConnectionResult.find(state).name());
-	//	}
 }
