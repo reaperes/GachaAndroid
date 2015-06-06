@@ -12,6 +12,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import today.gacha.android.core.ExtendedFragmentActivity.OnActivityPauseListener;
+import today.gacha.android.utils.LogUtils;
 
 import static com.google.android.gms.common.api.GoogleApiClient.*;
 
@@ -21,7 +22,7 @@ import static com.google.android.gms.common.api.GoogleApiClient.*;
  * @author Namhoon
  */
 public class GachaLocationService implements GachaService, OnActivityPauseListener {
-	private static final String TAG = GachaLocationService.class.getSimpleName();
+	private static final String TAG = LogUtils.makeTag(GachaLocationService.class);
 
 	static volatile GachaLocationService singleton = null;
 

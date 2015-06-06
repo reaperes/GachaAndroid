@@ -3,6 +3,7 @@ package today.gacha.android.core;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import today.gacha.android.services.GachaService;
+import today.gacha.android.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
  * @author Namhoon
  */
 public class ExtendedFragmentActivity extends FragmentActivity {
-	private static final String TAG = ExtendedFragmentActivity.class.getSimpleName();
+	private static final String TAG = LogUtils.makeTag(ExtendedFragmentActivity.class);
 
 	private List<GachaService> services = new ArrayList<>(3);
 

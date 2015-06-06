@@ -13,6 +13,7 @@ import today.gacha.android.R;
 import today.gacha.android.services.GachaLocationService;
 import today.gacha.android.services.GachaLocationService.FailReason;
 import today.gacha.android.services.GachaLocationService.LocationCallback;
+import today.gacha.android.utils.LogUtils;
 
 /**
  * Activity step
@@ -23,7 +24,7 @@ import today.gacha.android.services.GachaLocationService.LocationCallback;
  */
 public class MapsActivity extends ExtendedFragmentActivity {
 
-	private static final String TAG = MapsActivity.class.getSimpleName();
+	private static final String TAG = LogUtils.makeTag(MapsActivity.class);
 
 	// default position
 	private static final LatLng NHN_NEXT = new LatLng(37.40208147037274d, 127.10891090333462);

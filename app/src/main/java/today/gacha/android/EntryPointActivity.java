@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import com.urqa.clientinterface.URQAController;
 import today.gacha.android.ui.MapsActivity;
+import today.gacha.android.utils.LogUtils;
 
 /**
  * Initialize and register urqa service.
@@ -13,7 +14,7 @@ import today.gacha.android.ui.MapsActivity;
  * @author Namhoon
  */
 public class EntryPointActivity extends Activity {
-	private static final String TAG = EntryPointActivity.class.getSimpleName();
+	private static final String TAG = LogUtils.makeTag(EntryPointActivity.class);
 
 	private static final String URQA_KEY = "C3AC5133";
 
