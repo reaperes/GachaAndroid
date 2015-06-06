@@ -11,6 +11,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import lombok.Getter;
 import today.gacha.android.core.ExtendedFragmentActivity;
 import today.gacha.android.utils.LogUtils;
 
@@ -38,6 +39,7 @@ public class GachaLocationService implements GachaService, ExtendedFragmentActiv
 	 * (onPause) NotReady ► ► Ready (onResume)
 	 *                    ◄ ◄
 	 */
+	@Getter
 	private State state = State.NotReady;
 
 	GachaLocationService(LocationManager locationManager, GoogleApiClient googleApiClient) {
@@ -60,19 +62,14 @@ public class GachaLocationService implements GachaService, ExtendedFragmentActiv
 		return singleton;
 	}
 
-	public void getCurrentLocation(@NonNull final LocationCallback callback) {
+	public void requestCurrentLocation(@NonNull final LocationCallback callback) {
 		if (state != State.Ready) {
-			FailReason reason = FailReason.REASON;
-			reason.setMessage("Location service is not ready yet.");
-			callback.onCompleted(null, reason);
+			failRequest(callback, "Location service is not ready yet.");
 			return;
 		}
 
 		if (!isGpsEnable()) {
-			FailReason reason = FailReason.REASON;
-			reason.setMessage("GPS is not enabled.");
-			callback.onCompleted(null, reason);
-			state = State.Ready;
+			failRequest(callback, "GPS is not enabled.");
 			return;
 		}
 
@@ -81,21 +78,11 @@ public class GachaLocationService implements GachaService, ExtendedFragmentActiv
 			public void onConnected(Bundle bundle) {
 				Log.d(TAG, "Google api connection connected.");
 
-				/**
-				 * <a href="https://developer.android.com/training/location/receive-location-updates.html">Reference</a>
-				 */
-				LocationRequest request = new LocationRequest();
-				request.setInterval(1000);
-				request.setFastestInterval(1000);
-				request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-				request.setExpirationDuration(10000);  // 10 seconds
-				request.setNumUpdates(1);
-
-				LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request,
+				LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, createLocationRequest(),
 						new LocationListener() {
 							@Override
 							public void onLocationChanged(Location location) {
-								callback.onCompleted(location, null);
+								successRequest(location, callback);
 							}
 						});
 			}
@@ -106,27 +93,20 @@ public class GachaLocationService implements GachaService, ExtendedFragmentActiv
 			public void onConnectionFailed(ConnectionResult result) {
 				Log.w(TAG, "Google api with LocationServices connection failed - " + result.toString());
 
-				FailReason reason = FailReason.REASON;
-				reason.setMessage(result.toString());
-				callback.onCompleted(null, reason);
+				failRequest(callback, result.toString());
 				state = State.Ready;
 			}
 		};
 
-		googleApiClient.registerConnectionCallbacks(connectionCallbacks);
-		googleApiClient.registerConnectionFailedListener(connectionFailedListener);
-		state = State.Connecting;
-		googleApiClient.connect();
+		connectWithCallbacks(connectionCallbacks, connectionFailedListener);
 	}
 
 	/**
 	 * Get user's last location. Must use this method during start and stop activity life cycle.
 	 */
-	public void getLastLocation(@NonNull final LocationCallback callback) {
+	public void requestLastLocation(@NonNull final LocationCallback callback) {
 		if (state != State.Ready) {
-			FailReason reason = FailReason.REASON;
-			reason.setMessage("Location service is not ready yet.");
-			callback.onCompleted(null, reason);
+			failRequest(callback, "Location service is not ready yet.");
 			return;
 		}
 
@@ -135,8 +115,7 @@ public class GachaLocationService implements GachaService, ExtendedFragmentActiv
 			public void onConnected(Bundle bundle) {
 				Log.d(TAG, "Google api connection connected.");
 
-				callback.onCompleted(LocationServices.FusedLocationApi.getLastLocation(googleApiClient), null);
-				state = State.Ready;
+				successRequest(LocationServices.FusedLocationApi.getLastLocation(googleApiClient), callback);
 			}
 		};
 
@@ -145,17 +124,12 @@ public class GachaLocationService implements GachaService, ExtendedFragmentActiv
 			public void onConnectionFailed(ConnectionResult result) {
 				Log.w(TAG, "Google api with LocationServices connection failed - " + result.toString());
 
-				FailReason reason = FailReason.REASON;
-				reason.setMessage(result.toString());
-				callback.onCompleted(null, reason);
+				failRequest(callback, result.toString());
 				state = State.Ready;
 			}
 		};
 
-		googleApiClient.registerConnectionCallbacks(connectionCallbacks);
-		googleApiClient.registerConnectionFailedListener(connectionFailedListener);
-		state = State.Connecting;
-		googleApiClient.connect();
+		connectWithCallbacks(connectionCallbacks, connectionFailedListener);
 	}
 
 	public boolean isGpsEnable() {
@@ -195,19 +169,41 @@ public class GachaLocationService implements GachaService, ExtendedFragmentActiv
 	public void onActivityDestroyed() {
 	}
 
-	/**
-	 * Service state. Google api can be used specific life cycle, between start and stop.
-	 * State is {@link .State.Ready} or {@link .State.Connecting}, during start and stop.
-	 * Others it is {@link .State.NotReady}. It may be {@link .State.Connecting} during google api request something.
-	 */
-	private enum State {
-		NotReady,
-		Ready,
-		Connecting
+	private void successRequest(Location location, @NonNull LocationCallback callback) {
+		state = State.Ready;
+		callback.onCompleted(location, null);
+	}
+
+	private void failRequest(@NonNull LocationCallback callback, String message) {
+		FailReason reason = FailReason.DEFAULT;
+		reason.setMessage(message);
+		callback.onCompleted(null, reason);
+	}
+
+	private void connectWithCallbacks(ConnectionCallbacks connectionCallbacks,
+			OnConnectionFailedListener connectionFailedListener) {
+		state = State.Connecting;
+
+		googleApiClient.registerConnectionCallbacks(connectionCallbacks);
+		googleApiClient.registerConnectionFailedListener(connectionFailedListener);
+		googleApiClient.connect();
+	}
+
+	private LocationRequest createLocationRequest() {
+		/**
+		 * <a href="https://developer.android.com/training/location/receive-location-updates.html">Reference</a>
+		 */
+		LocationRequest request = new LocationRequest();
+		request.setInterval(1000);
+		request.setFastestInterval(1000);
+		request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+		request.setExpirationDuration(10000);  // 10 seconds
+		request.setNumUpdates(1);
+		return request;
 	}
 
 	public enum FailReason {
-		REASON;
+		DEFAULT;
 
 		String message;
 
@@ -218,6 +214,17 @@ public class GachaLocationService implements GachaService, ExtendedFragmentActiv
 		public void setMessage(String message) {
 			this.message = message;
 		}
+	}
+
+	/**
+	 * Service state. Google api can be used specific life cycle, between start and stop.
+	 * State is {@link .State.Ready} or {@link .State.Connecting}, during start and stop.
+	 * Others it is {@link .State.NotReady}. It may be {@link .State.Connecting} during google api request something.
+	 */
+	enum State {
+		NotReady,
+		Ready,
+		Connecting;
 	}
 
 	public interface LocationCallback {

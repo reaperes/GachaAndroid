@@ -48,7 +48,7 @@ public class MapsActivity extends ExtendedFragmentActivity {
 	protected void onResume() {
 		super.onResume();
 
-		locationService.getLastLocation(new LocationCallback() {
+		locationService.requestLastLocation(new LocationCallback() {
 			@Override
 			public void onCompleted(Location location, FailReason reason) {
 				if (location != null) {
@@ -57,7 +57,7 @@ public class MapsActivity extends ExtendedFragmentActivity {
 				}
 				Log.d(TAG, "Get last location failed - " + reason.getMessage());
 
-				locationService.getCurrentLocation(new LocationCallback() {
+				locationService.requestCurrentLocation(new LocationCallback() {
 					@Override
 					public void onCompleted(Location location, FailReason reason) {
 						if (location != null) {
