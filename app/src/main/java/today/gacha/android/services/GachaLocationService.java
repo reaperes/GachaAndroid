@@ -12,7 +12,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import lombok.Getter;
-import today.gacha.android.core.ExtendedFragmentActivity;
+import today.gacha.android.core.OnActivityPausedListener;
+import today.gacha.android.core.OnActivityResumeListener;
 import today.gacha.android.utils.LogUtils;
 
 import static com.google.android.gms.common.api.GoogleApiClient.*;
@@ -22,7 +23,7 @@ import static com.google.android.gms.common.api.GoogleApiClient.*;
  *
  * @author Namhoon
  */
-public class GachaLocationService implements GachaService, ExtendedFragmentActivity.OnActivityLifeCycleListener {
+public class GachaLocationService implements GachaService, OnActivityResumeListener, OnActivityPausedListener {
 	private static final String TAG = LogUtils.makeTag(GachaLocationService.class);
 
 	static volatile GachaLocationService singleton = null;
@@ -137,14 +138,6 @@ public class GachaLocationService implements GachaService, ExtendedFragmentActiv
 	}
 
 	@Override
-	public void onActivityCreated() {
-	}
-
-	@Override
-	public void onActivityStarted() {
-	}
-
-	@Override
 	public void onActivityResumed() {
 		if (state == State.NotReady) {
 			state = State.Ready;
@@ -159,14 +152,6 @@ public class GachaLocationService implements GachaService, ExtendedFragmentActiv
 			Log.d(TAG, "Google api client disconnected.");
 			googleApiClient.disconnect();
 		}
-	}
-
-	@Override
-	public void onActivityStopped() {
-	}
-
-	@Override
-	public void onActivityDestroyed() {
 	}
 
 	private void successRequest(Location location, @NonNull LocationCallback callback) {

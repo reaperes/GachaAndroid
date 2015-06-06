@@ -15,93 +15,60 @@ import java.util.List;
 public class ExtendedFragmentActivity extends FragmentActivity {
 	private static final String TAG = LogUtils.makeTag(ExtendedFragmentActivity.class);
 
-	private List<GachaService> services = new ArrayList<>(3);
+	private List<ActivityLifeCycleListener> lifeCycleListeners = new ArrayList<>(3);
 
-	protected void addService(GachaService service) {
-		if (services.contains(service)) {
-			Log.w(TAG, "Added duplicated service instance");
+	protected void addActivityLifeCycleListener(ActivityLifeCycleListener lifeCycleListener) {
+		if (lifeCycleListeners.contains(lifeCycleListener)) {
+			Log.w(TAG, "Added duplicated lifeCycleListener instance");
 		}
-		services.add(service);
+		lifeCycleListeners.add(lifeCycleListener);
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		for (GachaService service : services)
-			if (service instanceof OnActivityCreateListener)
-				((OnActivityCreateListener) service).onActivityCreated();
+		for (ActivityLifeCycleListener listener : lifeCycleListeners)
+			if (listener instanceof OnActivityCreateListener)
+				((OnActivityCreateListener) listener).onActivityCreated();
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
-		for (GachaService service : services)
-			if (service instanceof OnActivityStartListener)
-				((OnActivityStartListener) service).onActivityStarted();
+		for (ActivityLifeCycleListener listener : lifeCycleListeners)
+			if (listener instanceof OnActivityStartListener)
+				((OnActivityStartListener) listener).onActivityStarted();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		for (GachaService service : services)
-			if (service instanceof OnActivityResumeListener)
-				((OnActivityResumeListener) service).onActivityResumed();
+		for (ActivityLifeCycleListener listener : lifeCycleListeners)
+			if (listener instanceof OnActivityResumeListener)
+				((OnActivityResumeListener) listener).onActivityResumed();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		for (GachaService service : services)
-			if (service instanceof OnActivityPauseListener)
-				((OnActivityPauseListener) service).onActivityPaused();
+		for (ActivityLifeCycleListener listener : lifeCycleListeners)
+			if (listener instanceof OnActivityPausedListener)
+				((OnActivityPausedListener) listener).onActivityPaused();
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
-		for (GachaService service : services)
-			if (service instanceof OnActivityStopListener)
-				((OnActivityStopListener) service).onActivityStopped();
+		for (ActivityLifeCycleListener listener : lifeCycleListeners)
+			if (listener instanceof OnActivityStopListener)
+				((OnActivityStopListener) listener).onActivityStopped();
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		for (GachaService service : services)
-			if (service instanceof OnActivityDestroyedListener)
-				((OnActivityDestroyedListener) service).onActivityDestroyed();
-	}
-
-	public interface OnActivityCreateListener {
-		void onActivityCreated();
-	}
-
-	public interface OnActivityStartListener {
-		void onActivityStarted();
-	}
-
-	public interface OnActivityResumeListener {
-		void onActivityResumed();
-	}
-
-	public interface OnActivityPauseListener {
-		void onActivityPaused();
-	}
-
-	public interface OnActivityStopListener {
-		void onActivityStopped();
-	}
-
-	public interface OnActivityDestroyedListener {
-		void onActivityDestroyed();
-	}
-
-	public interface OnActivityLifeCycleListener
-			extends OnActivityCreateListener,
-			OnActivityStartListener,
-			OnActivityResumeListener,
-			OnActivityPauseListener,
-			OnActivityStopListener,
-			OnActivityDestroyedListener {
+		for (ActivityLifeCycleListener listener : lifeCycleListeners)
+			if (listener instanceof OnActivityDestroyedListener)
+				((OnActivityDestroyedListener) listener).onActivityDestroyed();
 	}
 }

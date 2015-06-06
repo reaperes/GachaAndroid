@@ -40,6 +40,7 @@ public class MapsActivity extends ExtendedFragmentActivity {
 		setContentView(R.layout.activity_maps);
 
 		locationService = GachaLocationService.getService(this);
+		addActivityLifeCycleListener(locationService);
 
 		setUpGoogleMap();
 	}
