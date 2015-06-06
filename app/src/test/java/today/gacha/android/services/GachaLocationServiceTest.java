@@ -34,22 +34,10 @@ public class GachaLocationServiceTest {
 
 	@Test
 	public void state__is_Ready_only__when_activity_life_cycle_is_Resume() {
-		service.onActivityCreated();
-		assertState(NotReady);
-
-		service.onActivityStarted();
-		assertState(NotReady);
-
 		service.onActivityResumed();
 		assertState(Ready);
 
 		service.onActivityPaused();
-		assertState(NotReady);
-
-		service.onActivityStopped();
-		assertState(NotReady);
-
-		service.onActivityDestroyed();
 		assertState(NotReady);
 	}
 
