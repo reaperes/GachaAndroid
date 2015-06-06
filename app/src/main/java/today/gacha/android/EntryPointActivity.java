@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import com.urqa.clientinterface.URQAController;
+import today.gacha.android.ui.MapsActivity;
 
 /**
  * Initialize and register urqa service.

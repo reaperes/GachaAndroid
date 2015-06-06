@@ -1,4 +1,4 @@
-package today.gacha.android;
+package today.gacha.android.ui;
 
 import android.location.Location;
 import android.os.Bundle;
@@ -9,6 +9,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import today.gacha.android.R;
 import today.gacha.android.service.GachaLocationService;
 import today.gacha.android.service.GachaLocationService.FailReason;
 import today.gacha.android.service.GachaLocationService.LocationCallback;
