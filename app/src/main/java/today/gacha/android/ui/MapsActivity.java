@@ -64,7 +64,7 @@ public class MapsActivity extends ExtendedFragmentActivity {
 							animateGoogleMapCamera(location);
 							return;
 						}
-						Log.w(TAG, "Requet current location failed - " + reason.getMessage());
+						Log.w(TAG, "Request current location failed - " + reason.getMessage());
 					}
 				});
 			}
