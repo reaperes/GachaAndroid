@@ -11,23 +11,34 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import today.gacha.android.core.ExtendedFragmentActivity.OnActivityPauseListener;
+import today.gacha.android.core.ExtendedFragmentActivity;
 import today.gacha.android.utils.LogUtils;
 
 import static com.google.android.gms.common.api.GoogleApiClient.*;
 
 /**
- * Location service class.
+ * Location service class. Multi thread requests are not supported yet.
  *
  * @author Namhoon
  */
-public class GachaLocationService implements GachaService, OnActivityPauseListener {
+public class GachaLocationService implements GachaService, ExtendedFragmentActivity.OnActivityLifeCycleListener {
 	private static final String TAG = LogUtils.makeTag(GachaLocationService.class);
 
 	static volatile GachaLocationService singleton = null;
 
 	private final LocationManager locationManager;
 	private final GoogleApiClient googleApiClient;
+
+	/**
+	 * State's state diagram.
+	 *
+	 *               Connecting (when google api request)
+	 *               ▼ ▲      ▼
+	 *               ▼ ▲      ▼
+	 * (onPause) NotReady ► ► Ready (onResume)
+	 *                    ◄ ◄
+	 */
+	private State state = State.NotReady;
 
 	private GachaLocationService(Context context) {
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -48,10 +59,18 @@ public class GachaLocationService implements GachaService, OnActivityPauseListen
 	}
 
 	public void getCurrentLocation(@NonNull final LocationCallback callback) {
+		if (state != State.Ready) {
+			FailReason reason = FailReason.REASON;
+			reason.setMessage("Location service is not ready yet.");
+			callback.onCompleted(null, reason);
+			return;
+		}
+
 		if (!isGpsEnable()) {
 			FailReason reason = FailReason.REASON;
 			reason.setMessage("GPS is not enabled.");
 			callback.onCompleted(null, reason);
+			state = State.Ready;
 			return;
 		}
 
@@ -88,11 +107,13 @@ public class GachaLocationService implements GachaService, OnActivityPauseListen
 				FailReason reason = FailReason.REASON;
 				reason.setMessage(result.toString());
 				callback.onCompleted(null, reason);
+				state = State.Ready;
 			}
 		};
 
 		googleApiClient.registerConnectionCallbacks(connectionCallbacks);
 		googleApiClient.registerConnectionFailedListener(connectionFailedListener);
+		state = State.Connecting;
 		googleApiClient.connect();
 	}
 
@@ -100,12 +121,20 @@ public class GachaLocationService implements GachaService, OnActivityPauseListen
 	 * Get user's last location. Must use this method during start and stop activity life cycle.
 	 */
 	public void getLastLocation(@NonNull final LocationCallback callback) {
+		if (state != State.Ready) {
+			FailReason reason = FailReason.REASON;
+			reason.setMessage("Location service is not ready yet.");
+			callback.onCompleted(null, reason);
+			return;
+		}
+
 		final ConnectionCallbacks connectionCallbacks = new AbstractConnectionCallbacks() {
 			@Override
 			public void onConnected(Bundle bundle) {
 				Log.d(TAG, "Google api connection connected.");
 
 				callback.onCompleted(LocationServices.FusedLocationApi.getLastLocation(googleApiClient), null);
+				state = State.Ready;
 			}
 		};
 
@@ -117,11 +146,13 @@ public class GachaLocationService implements GachaService, OnActivityPauseListen
 				FailReason reason = FailReason.REASON;
 				reason.setMessage(result.toString());
 				callback.onCompleted(null, reason);
+				state = State.Ready;
 			}
 		};
 
 		googleApiClient.registerConnectionCallbacks(connectionCallbacks);
 		googleApiClient.registerConnectionFailedListener(connectionFailedListener);
+		state = State.Connecting;
 		googleApiClient.connect();
 	}
 
@@ -130,11 +161,47 @@ public class GachaLocationService implements GachaService, OnActivityPauseListen
 	}
 
 	@Override
+	public void onActivityCreated() {
+	}
+
+	@Override
+	public void onActivityStarted() {
+	}
+
+	@Override
+	public void onActivityResumed() {
+		if (state == State.NotReady) {
+			state = State.Ready;
+		}
+	}
+
+	@Override
 	public void onActivityPaused() {
+		state = State.NotReady;
+
 		if (googleApiClient != null) {
 			Log.d(TAG, "Google api client disconnected.");
 			googleApiClient.disconnect();
 		}
+	}
+
+	@Override
+	public void onActivityStopped() {
+	}
+
+	@Override
+	public void onActivityDestroyed() {
+	}
+
+	/**
+	 * Service state. Google api can be used specific life cycle, between start and stop.
+	 * State is {@link .State.Ready} or {@link .State.Connecting}, during start and stop.
+	 * Others it is {@link .State.NotReady}. It may be {@link .State.Connecting} during google api request something.
+	 */
+	private enum State {
+		NotReady,
+		Ready,
+		Connecting
 	}
 
 	public enum FailReason {
