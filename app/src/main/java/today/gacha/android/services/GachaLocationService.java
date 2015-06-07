@@ -14,6 +14,7 @@ import com.squareup.otto.Bus;
 import lombok.Getter;
 import today.gacha.android.GachaApplication;
 import today.gacha.android.core.GachaEvent;
+import today.gacha.android.core.GachaService;
 import today.gacha.android.core.OnActivityPausedListener;
 import today.gacha.android.core.OnActivityResumeListener;
 import today.gacha.android.utils.LogUtils;
