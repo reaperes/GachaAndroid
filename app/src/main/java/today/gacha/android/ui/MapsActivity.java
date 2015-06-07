@@ -27,8 +27,6 @@ public class MapsActivity extends GachaFragmentActivity {
 	private GachaLocationService locationService;
 	private GoogleMapComponent mapComponent;
 
-	private GoogleMap googleMap;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
