@@ -56,7 +56,7 @@ public class MapsActivity extends GachaFragmentActivity {
 	@Subscribe
 	public void onLastLocation(LastLocationEvent event) {
 		if (event.isSuccess()) {
-			animateGoogleMapCamera(event.getLocation());
+			animateGoogleMapCamera(event.getData());
 			return;
 		}
 
@@ -67,7 +67,7 @@ public class MapsActivity extends GachaFragmentActivity {
 	@Subscribe
 	public void onCurrentLocation(CurrentLocationEvent event) {
 		if (event.isSuccess()) {
-			animateGoogleMapCamera(event.getLocation());
+			animateGoogleMapCamera(event.getData());
 			return;
 		}
 
@@ -87,6 +87,8 @@ public class MapsActivity extends GachaFragmentActivity {
 	private void setUpGoogleMap() {
 		if (googleMap == null) {
 			googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+
+			Log.d(TAG, "Set initial map position to NHN NEXT.");
 			googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(NHN_NEXT, DEFAULT_ZOOM_LEVEL));
 			googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 				@Override

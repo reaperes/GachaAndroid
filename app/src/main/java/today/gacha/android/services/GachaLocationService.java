@@ -91,7 +91,6 @@ public class GachaLocationService implements GachaService, OnActivityResumeListe
 	public void requestLastLocation() {
 		if (state != State.Ready) {
 			bus.post(new LastLocationEvent(new LocationServiceException("State is not ready")));
-			// TODO crash app and report urqa
 			return;
 		}
 
@@ -165,9 +164,18 @@ public class GachaLocationService implements GachaService, OnActivityResumeListe
 		public void onConnected(Bundle bundle) {
 			Log.d(TAG, "Google api connection connected.");
 
+			// If a location is not available, it can bu null,
+			//
+			// https://developers.google.com/android/reference/com/google/android/gms/location/
+			// FusedLocationProviderApi#getLastLocation(com.google.android.gms.common.api.GoogleApiClient)
 			Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+
 			state = State.Ready;
-			bus.post(new LastLocationEvent(lastLocation));
+			if (lastLocation == null) {
+				bus.post(new LastLocationEvent(new LocationServiceException("Getting last location is not available.")));
+			} else {
+				bus.post(new LastLocationEvent(lastLocation));
+			}
 		}
 	};
 
@@ -195,34 +203,26 @@ public class GachaLocationService implements GachaService, OnActivityResumeListe
 	/**
 	 * Event bus data for current request location.
 	 */
-	public static class CurrentLocationEvent extends GachaEvent {
-		@Getter
-		private Location location;
-
+	public static class CurrentLocationEvent extends GachaEvent<Location> {
 		CurrentLocationEvent(Throwable t) {
 			super(t);
 		}
 
 		CurrentLocationEvent(Location location) {
-			super(null);
-			this.location = location;
+			super(location);
 		}
 	}
 
 	/**
 	 * Event bus data for last request location.
 	 */
-	public static class LastLocationEvent extends GachaEvent {
-		@Getter
-		private Location location;
-
+	public static class LastLocationEvent extends GachaEvent<Location> {
 		LastLocationEvent(Throwable t) {
 			super(t);
 		}
 
 		LastLocationEvent(Location location) {
-			super(null);
-			this.location = location;
+			super(location);
 		}
 	}
 

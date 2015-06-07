@@ -5,12 +5,24 @@ import lombok.Getter;
 /**
  * @author Namhoon
  */
-public abstract class GachaEvent {
+public abstract class GachaEvent<T> {
 	@Getter
 	private final Throwable throwable;
 
-	public GachaEvent(final Throwable t) {
-		throwable = t;
+	private final T data;
+
+	@SuppressWarnings("unchecked")
+	public GachaEvent(final Object data) {
+		if (data == null) {
+			throwable = new GachaEventException("Event data is null.");
+			this.data = null;
+		} else if (data instanceof Throwable) {
+			throwable = (Throwable) data;
+			this.data = null;
+		} else {
+			throwable = null;
+			this.data = (T) data;
+		}
 	}
 
 	public boolean isSuccess() {
@@ -21,5 +33,9 @@ public abstract class GachaEvent {
 		if (throwable == null)
 			return "";
 		return throwable.getMessage();
+	}
+
+	public T getData() {
+		return data;
 	}
 }

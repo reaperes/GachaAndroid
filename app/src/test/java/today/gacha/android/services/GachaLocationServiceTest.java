@@ -71,7 +71,7 @@ public class GachaLocationServiceTest {
 			@Subscribe
 			public void subscribe(CurrentLocationEvent event) {
 				assertTrue(event.isSuccess());
-				assertNotNull(event.getLocation());
+				assertNotNull(event.getData());
 				latch.countDown();
 			}
 		});
@@ -88,7 +88,7 @@ public class GachaLocationServiceTest {
 			@Subscribe
 			public void subscribe(CurrentLocationEvent event) {
 				assertFalse(event.isSuccess());
-				assertNull(event.getLocation());
+				assertNull(event.getData());
 				latch.countDown();
 			}
 		});
@@ -106,7 +106,7 @@ public class GachaLocationServiceTest {
 			@Subscribe
 			public void subscribe(CurrentLocationEvent event) {
 				assertFalse(event.isSuccess());
-				assertNull(event.getLocation());
+				assertNull(event.getData());
 				latch.countDown();
 			}
 		});
@@ -124,7 +124,7 @@ public class GachaLocationServiceTest {
 			@Subscribe
 			public void subscribe(LastLocationEvent event) {
 				assertTrue(event.isSuccess());
-				assertNotNull(event.getLocation());
+				assertNotNull(event.getData());
 				latch.countDown();
 			}
 		});
@@ -141,7 +141,7 @@ public class GachaLocationServiceTest {
 			@Subscribe
 			public void subscribe(LastLocationEvent event) {
 				assertFalse(event.isSuccess());
-				assertNull(event.getLocation());
+				assertNull(event.getData());
 				latch.countDown();
 			}
 		});
