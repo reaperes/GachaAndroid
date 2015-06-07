@@ -3,7 +3,8 @@ package today.gacha.android.core;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import today.gacha.android.services.GachaService;
+import com.squareup.otto.Bus;
+import today.gacha.android.GachaApplication;
 import today.gacha.android.utils.LogUtils;
 
 import java.util.ArrayList;
@@ -12,8 +13,10 @@ import java.util.List;
 /**
  * @author Namhoon
  */
-public class ExtendedFragmentActivity extends FragmentActivity {
-	private static final String TAG = LogUtils.makeTag(ExtendedFragmentActivity.class);
+public class GachaFragmentActivity extends FragmentActivity {
+	private static final String TAG = LogUtils.makeTag(GachaFragmentActivity.class);
+
+	private Bus bus;
 
 	private List<ActivityLifeCycleListener> lifeCycleListeners = new ArrayList<>(3);
 
@@ -27,6 +30,7 @@ public class ExtendedFragmentActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		bus = ((GachaApplication) getApplicationContext()).getEventBus();
 		for (ActivityLifeCycleListener listener : lifeCycleListeners)
 			if (listener instanceof OnActivityCreateListener)
 				((OnActivityCreateListener) listener).onActivityCreated();
@@ -35,6 +39,7 @@ public class ExtendedFragmentActivity extends FragmentActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
+		bus.register(this);
 		for (ActivityLifeCycleListener listener : lifeCycleListeners)
 			if (listener instanceof OnActivityStartListener)
 				((OnActivityStartListener) listener).onActivityStarted();
@@ -59,6 +64,7 @@ public class ExtendedFragmentActivity extends FragmentActivity {
 	@Override
 	protected void onStop() {
 		super.onStop();
+		bus.unregister(this);
 		for (ActivityLifeCycleListener listener : lifeCycleListeners)
 			if (listener instanceof OnActivityStopListener)
 				((OnActivityStopListener) listener).onActivityStopped();

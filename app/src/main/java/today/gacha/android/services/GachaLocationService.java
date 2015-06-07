@@ -4,19 +4,22 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.squareup.otto.Bus;
 import lombok.Getter;
+import today.gacha.android.GachaApplication;
+import today.gacha.android.core.GachaEvent;
 import today.gacha.android.core.OnActivityPausedListener;
 import today.gacha.android.core.OnActivityResumeListener;
 import today.gacha.android.utils.LogUtils;
 
-import static com.google.android.gms.common.api.GoogleApiClient.*;
+import static com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import static com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 
 /**
  * Location service class. Multi thread requests are not supported yet.
@@ -27,9 +30,9 @@ public class GachaLocationService implements GachaService, OnActivityResumeListe
 	private static final String TAG = LogUtils.makeTag(GachaLocationService.class);
 
 	static volatile GachaLocationService singleton = null;
-
 	private final LocationManager locationManager;
 	private final GoogleApiClient googleApiClient;
+	private Bus bus;
 
 	/**
 	 * State's state diagram.
@@ -43,7 +46,8 @@ public class GachaLocationService implements GachaService, OnActivityResumeListe
 	@Getter
 	private State state = State.NotReady;
 
-	GachaLocationService(LocationManager locationManager, GoogleApiClient googleApiClient) {
+	GachaLocationService(Bus bus, LocationManager locationManager, GoogleApiClient googleApiClient) {
+		this.bus = bus;
 		this.locationManager = locationManager;
 		this.googleApiClient = googleApiClient;
 	}
@@ -52,85 +56,49 @@ public class GachaLocationService implements GachaService, OnActivityResumeListe
 		if (singleton == null) {
 			synchronized (GachaLocationService.class) {
 				if (singleton == null) {
+					Bus bus = ((GachaApplication) context.getApplicationContext()).getEventBus();
 					LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-					GoogleApiClient googleApiClient = new Builder(context.getApplicationContext())
+					GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context.getApplicationContext())
 							.addApi(LocationServices.API)
 							.build();
-					singleton = new GachaLocationService(locationManager, googleApiClient);
+					singleton = new GachaLocationService(bus, locationManager, googleApiClient);
 				}
 			}
 		}
 		return singleton;
 	}
 
-	public void requestCurrentLocation(@NonNull final LocationCallback callback) {
+	public void requestCurrentLocation() {
 		if (state != State.Ready) {
-			failRequest(callback, "Location service is not ready yet.");
+			bus.post(new CurrentLocationEvent(new LocationServiceException("Location service is not ready yet.")));
 			return;
 		}
 
 		if (!isGpsEnable()) {
-			failRequest(callback, "GPS is not enabled.");
+			bus.post(new CurrentLocationEvent(new LocationServiceException("GPS is not enabled.")));
 			return;
 		}
 
-		final ConnectionCallbacks connectionCallbacks = new AbstractConnectionCallbacks() {
-			@Override
-			public void onConnected(Bundle bundle) {
-				Log.d(TAG, "Google api connection connected.");
-
-				LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, createLocationRequest(),
-						new LocationListener() {
-							@Override
-							public void onLocationChanged(Location location) {
-								successRequest(location, callback);
-							}
-						});
-			}
-		};
-
-		final OnConnectionFailedListener connectionFailedListener = new AbstractConnectionFailedListener() {
-			@Override
-			public void onConnectionFailed(ConnectionResult result) {
-				Log.w(TAG, "Google api with LocationServices connection failed - " + result.toString());
-
-				failRequest(callback, result.toString());
-				state = State.Ready;
-			}
-		};
-
-		connectWithCallbacks(connectionCallbacks, connectionFailedListener);
+		state = State.Connecting;
+		googleApiClient.registerConnectionCallbacks(currentLocationEventProducer);
+		googleApiClient.registerConnectionFailedListener(connectionFailedEventProducer);
+		googleApiClient.connect();
 	}
 
 	/**
 	 * Get user's last location. Must use this method during start and stop activity life cycle.
 	 */
-	public void requestLastLocation(@NonNull final LocationCallback callback) {
+	public void requestLastLocation() {
 		if (state != State.Ready) {
-			failRequest(callback, "Location service is not ready yet.");
+			bus.post(new LastLocationEvent(new LocationServiceException("State is not ready")));
+			// TODO crash app and report urqa
 			return;
 		}
 
-		final ConnectionCallbacks connectionCallbacks = new AbstractConnectionCallbacks() {
-			@Override
-			public void onConnected(Bundle bundle) {
-				Log.d(TAG, "Google api connection connected.");
-
-				successRequest(LocationServices.FusedLocationApi.getLastLocation(googleApiClient), callback);
-			}
-		};
-
-		final OnConnectionFailedListener connectionFailedListener = new AbstractConnectionFailedListener() {
-			@Override
-			public void onConnectionFailed(ConnectionResult result) {
-				Log.w(TAG, "Google api with LocationServices connection failed - " + result.toString());
-
-				failRequest(callback, result.toString());
-				state = State.Ready;
-			}
-		};
-
-		connectWithCallbacks(connectionCallbacks, connectionFailedListener);
+		state = State.Connecting;
+		googleApiClient.registerConnectionCallbacks(lastLocationEventProducer);
+		googleApiClient.registerConnectionFailedListener(lastLocationFailedEventProducer);
+		googleApiClient.connect();
 	}
 
 	public boolean isGpsEnable() {
@@ -139,6 +107,7 @@ public class GachaLocationService implements GachaService, OnActivityResumeListe
 
 	@Override
 	public void onActivityResumed() {
+		bus.register(this);
 		if (state == State.NotReady) {
 			state = State.Ready;
 		}
@@ -146,32 +115,12 @@ public class GachaLocationService implements GachaService, OnActivityResumeListe
 
 	@Override
 	public void onActivityPaused() {
+		bus.unregister(this);
 		state = State.NotReady;
-
 		if (googleApiClient != null) {
 			Log.d(TAG, "Google api client disconnected.");
 			googleApiClient.disconnect();
 		}
-	}
-
-	private void successRequest(Location location, @NonNull LocationCallback callback) {
-		state = State.Ready;
-		callback.onCompleted(location, null);
-	}
-
-	private void failRequest(@NonNull LocationCallback callback, String message) {
-		FailReason reason = FailReason.DEFAULT;
-		reason.setMessage(message);
-		callback.onCompleted(null, reason);
-	}
-
-	private void connectWithCallbacks(ConnectionCallbacks connectionCallbacks,
-			OnConnectionFailedListener connectionFailedListener) {
-		state = State.Connecting;
-
-		googleApiClient.registerConnectionCallbacks(connectionCallbacks);
-		googleApiClient.registerConnectionFailedListener(connectionFailedListener);
-		googleApiClient.connect();
 	}
 
 	private LocationRequest createLocationRequest() {
@@ -187,19 +136,50 @@ public class GachaLocationService implements GachaService, OnActivityResumeListe
 		return request;
 	}
 
-	public enum FailReason {
-		DEFAULT;
-
-		String message;
-
-		public String getMessage() {
-			return message;
+	private final OnConnectionFailedListener connectionFailedEventProducer = new OnConnectionFailedListener() {
+		@Override
+		public void onConnectionFailed(ConnectionResult result) {
+			Log.w(TAG, "Google api with LocationServices connection failed - " + result.toString());
+			state = State.Ready;
+			bus.post(new CurrentLocationEvent(new LocationServiceException(result.toString())));
 		}
+	};
 
-		public void setMessage(String message) {
-			this.message = message;
+	private final AbstractConnectionCallbacks currentLocationEventProducer = new AbstractConnectionCallbacks() {
+		@Override
+		public void onConnected(Bundle bundle) {
+			Log.d(TAG, "Google api connection connected.");
+			LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, createLocationRequest(),
+					new LocationListener() {
+						@Override
+						public void onLocationChanged(Location location) {
+							state = State.Ready;
+							bus.post(new CurrentLocationEvent(location));
+						}
+					});
 		}
-	}
+	};
+
+	private ConnectionCallbacks lastLocationEventProducer = new AbstractConnectionCallbacks() {
+		@Override
+		public void onConnected(Bundle bundle) {
+			Log.d(TAG, "Google api connection connected.");
+
+			Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+			state = State.Ready;
+			bus.post(new LastLocationEvent(lastLocation));
+		}
+	};
+
+	private OnConnectionFailedListener lastLocationFailedEventProducer = new OnConnectionFailedListener() {
+		@Override
+		public void onConnectionFailed(ConnectionResult result) {
+			Log.w(TAG, "Google api with LocationServices connection failed - " + result.toString());
+
+			state = State.Ready;
+			bus.post(new LastLocationEvent(new LocationServiceException(result.toString())));
+		}
+	};
 
 	/**
 	 * Service state. Google api can be used specific life cycle, between start and stop.
@@ -209,21 +189,40 @@ public class GachaLocationService implements GachaService, OnActivityResumeListe
 	enum State {
 		NotReady,
 		Ready,
-		Connecting;
+		Connecting
 	}
 
-	public interface LocationCallback {
-		/**
-		 * @param location it may be null, if fails
-		 * @param reason failed reason
-		 */
-		void onCompleted(Location location, FailReason reason);
+	/**
+	 * Event bus data for current request location.
+	 */
+	public static class CurrentLocationEvent extends GachaEvent {
+		@Getter
+		private Location location;
+
+		CurrentLocationEvent(Throwable t) {
+			super(t);
+		}
+
+		CurrentLocationEvent(Location location) {
+			super(null);
+			this.location = location;
+		}
 	}
 
-	private abstract class AbstractConnectionFailedListener implements OnConnectionFailedListener {
-		@Override
-		public void onConnectionFailed(ConnectionResult connectionResult) {
-			Log.e(TAG, "Google api with LocationServices connection failed.");
+	/**
+	 * Event bus data for last request location.
+	 */
+	public static class LastLocationEvent extends GachaEvent {
+		@Getter
+		private Location location;
+
+		LastLocationEvent(Throwable t) {
+			super(t);
+		}
+
+		LastLocationEvent(Location location) {
+			super(null);
+			this.location = location;
 		}
 	}
 

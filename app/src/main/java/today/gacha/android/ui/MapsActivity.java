@@ -8,11 +8,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import today.gacha.android.core.ExtendedFragmentActivity;
+import com.squareup.otto.Subscribe;
 import today.gacha.android.R;
+import today.gacha.android.core.GachaFragmentActivity;
 import today.gacha.android.services.GachaLocationService;
-import today.gacha.android.services.GachaLocationService.FailReason;
-import today.gacha.android.services.GachaLocationService.LocationCallback;
+import today.gacha.android.services.GachaLocationService.CurrentLocationEvent;
+import today.gacha.android.services.GachaLocationService.LastLocationEvent;
 import today.gacha.android.utils.LogUtils;
 
 /**
@@ -22,7 +23,7 @@ import today.gacha.android.utils.LogUtils;
  * 2. Get user's last location.
  * 3. Get user's current location.
  */
-public class MapsActivity extends ExtendedFragmentActivity {
+public class MapsActivity extends GachaFragmentActivity {
 
 	private static final String TAG = LogUtils.makeTag(MapsActivity.class);
 
@@ -49,27 +50,28 @@ public class MapsActivity extends ExtendedFragmentActivity {
 	protected void onResume() {
 		super.onResume();
 
-		locationService.requestLastLocation(new LocationCallback() {
-			@Override
-			public void onCompleted(Location location, FailReason reason) {
-				if (location != null) {
-					animateGoogleMapCamera(location);
-					return;
-				}
-				Log.d(TAG, "Get last location failed - " + reason.getMessage());
+		locationService.requestLastLocation();
+	}
 
-				locationService.requestCurrentLocation(new LocationCallback() {
-					@Override
-					public void onCompleted(Location location, FailReason reason) {
-						if (location != null) {
-							animateGoogleMapCamera(location);
-							return;
-						}
-						Log.w(TAG, "Request current location failed - " + reason.getMessage());
-					}
-				});
-			}
-		});
+	@Subscribe
+	public void onLastLocation(LastLocationEvent event) {
+		if (event.isSuccess()) {
+			animateGoogleMapCamera(event.getLocation());
+			return;
+		}
+
+		Log.d(TAG, "Get last location failed - " + event.getThrowableMessage());
+		locationService.requestCurrentLocation();
+	}
+
+	@Subscribe
+	public void onCurrentLocation(CurrentLocationEvent event) {
+		if (event.isSuccess()) {
+			animateGoogleMapCamera(event.getLocation());
+			return;
+		}
+
+		Log.w(TAG, "Request current location failed - " + event.getThrowableMessage());
 	}
 
 	private void animateGoogleMapCamera(Location lastLocation) {
