@@ -2,14 +2,18 @@ package today.gacha.android.ui;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.squareup.otto.Subscribe;
 import today.gacha.android.R;
 import today.gacha.android.core.GachaFragmentActivity;
+import today.gacha.android.domain.Restaurant;
 import today.gacha.android.services.GachaLocationService;
 import today.gacha.android.services.GachaLocationService.CurrentLocationEvent;
 import today.gacha.android.services.GachaLocationService.LastLocationEvent;
+import today.gacha.android.services.RestaurantsService.RestaurantsDataEvent;
 import today.gacha.android.ui.component.GoogleMapComponent;
 import today.gacha.android.utils.LogUtils;
 
@@ -46,6 +50,9 @@ public class MapsActivity extends GachaFragmentActivity {
 		locationService.requestLastLocation();
 	}
 
+	/**
+	 * @see today.gacha.android.services.GachaLocationService
+	 */
 	@Subscribe
 	public void onLastLocation(LastLocationEvent event) {
 		if (event.isSuccess()) {
@@ -57,6 +64,9 @@ public class MapsActivity extends GachaFragmentActivity {
 		locationService.requestCurrentLocation();
 	}
 
+	/**
+	 * @see today.gacha.android.services.GachaLocationService
+	 */
 	@Subscribe
 	public void onCurrentLocation(CurrentLocationEvent event) {
 		if (event.isSuccess()) {
@@ -65,5 +75,40 @@ public class MapsActivity extends GachaFragmentActivity {
 		}
 
 		Log.w(TAG, "Request current location failed - " + event.getThrowableMessage());
+	}
+
+	@Subscribe
+	public void onRestaurantsDataReceived(RestaurantsDataEvent event) {
+		if (event.isSuccess()) {
+			for (Restaurant restaurant : event.getData()) {
+				mapComponent.addMarker(restaurant);
+			}
+		}
+	}
+
+	/**************************************************
+	 * For debugging
+	 **************************************************/
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add(0, 0, Menu.NONE, "addMarkerTest");
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case 0:
+				Restaurant restaurant = Restaurant.builder()
+						.latitude(37.40208147037274d)
+						.longitude(127.10891090333462d)
+						.name("NHN NEXT")
+						.score(100)
+						.build();
+
+				mapComponent.addMarker(restaurant);
+				break;
+		}
+		return false;
 	}
 }

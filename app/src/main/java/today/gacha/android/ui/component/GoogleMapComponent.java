@@ -6,6 +6,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import today.gacha.android.domain.Restaurant;
 import today.gacha.android.utils.LogUtils;
 
 /**
@@ -18,10 +21,10 @@ public class GoogleMapComponent {
 	private static final LatLng NHN_NEXT = new LatLng(37.40208147037274d, 127.10891090333462);
 	private static final float DEFAULT_ZOOM_LEVEL = 14f;
 
-	private GoogleMap googleMap;
+	private GoogleMap map;
 
-	public GoogleMapComponent(GoogleMap googleMap) {
-		this.googleMap = googleMap;
+	public GoogleMapComponent(GoogleMap map) {
+		this.map = map;
 
 		setCameraToNHNNEXT();
 		setLoggerOnClickEvent();
@@ -34,15 +37,24 @@ public class GoogleMapComponent {
 				.build();
 
 		Log.d(TAG, "Move google map camera to location - " + location.toString());
-		googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+		map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+	}
+
+	public void addMarker(Restaurant restaurant) {
+		Marker marker = map.addMarker(new MarkerOptions()
+				.position(new LatLng(restaurant.getLatitude(), restaurant.getLongitude()))
+				.title(restaurant.getName())
+				.snippet("Score: " + String.valueOf(restaurant.getScore())));
+
+		marker.showInfoWindow();
 	}
 
 	private void setCameraToNHNNEXT() {
-		googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(NHN_NEXT, DEFAULT_ZOOM_LEVEL));
+		map.moveCamera(CameraUpdateFactory.newLatLngZoom(NHN_NEXT, DEFAULT_ZOOM_LEVEL));
 	}
 
 	private void setLoggerOnClickEvent() {
-		googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+		map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 			@Override
 			public void onMapClick(LatLng latLng) {
 				Log.e(TAG, "lat: " + String.valueOf(latLng.latitude));
