@@ -57,6 +57,10 @@ public class GoogleMapComponent {
 		marker.showInfoWindow();
 	}
 
+	public LatLng getDefaultLatLng() {
+		return NHN_NEXT;
+	}
+
 	private void setCameraToNHNNEXT() {
 		map.moveCamera(CameraUpdateFactory.newLatLngZoom(NHN_NEXT, DEFAULT_ZOOM_LEVEL));
 	}
