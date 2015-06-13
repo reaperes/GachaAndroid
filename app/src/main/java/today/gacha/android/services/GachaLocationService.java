@@ -13,10 +13,7 @@ import com.google.android.gms.location.LocationServices;
 import com.squareup.otto.Bus;
 import lombok.Getter;
 import today.gacha.android.GachaApplication;
-import today.gacha.android.core.GachaEvent;
-import today.gacha.android.core.GachaService;
-import today.gacha.android.core.OnActivityPausedListener;
-import today.gacha.android.core.OnActivityResumeListener;
+import today.gacha.android.core.*;
 import today.gacha.android.utils.LogUtils;
 
 import static com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -71,12 +68,12 @@ public class GachaLocationService implements GachaService, OnActivityResumeListe
 
 	public void requestCurrentLocation() {
 		if (state != State.Ready) {
-			bus.post(new CurrentLocationEvent(new LocationServiceException("Location service is not ready yet.")));
+			bus.post(new CurrentLocationEvent(new ServiceException("Location service is not ready yet.")));
 			return;
 		}
 
 		if (!isGpsEnable()) {
-			bus.post(new CurrentLocationEvent(new LocationServiceException("GPS is not enabled.")));
+			bus.post(new CurrentLocationEvent(new ServiceException("GPS is not enabled.")));
 			return;
 		}
 
@@ -91,7 +88,7 @@ public class GachaLocationService implements GachaService, OnActivityResumeListe
 	 */
 	public void requestLastLocation() {
 		if (state != State.Ready) {
-			bus.post(new LastLocationEvent(new LocationServiceException("State is not ready")));
+			bus.post(new LastLocationEvent(new ServiceException("State is not ready")));
 			return;
 		}
 
@@ -141,7 +138,7 @@ public class GachaLocationService implements GachaService, OnActivityResumeListe
 		public void onConnectionFailed(ConnectionResult result) {
 			Log.w(TAG, "Google api with LocationServices connection failed - " + result.toString());
 			state = State.Ready;
-			bus.post(new CurrentLocationEvent(new LocationServiceException(result.toString())));
+			bus.post(new CurrentLocationEvent(new ServiceException(result.toString())));
 		}
 	};
 
@@ -173,7 +170,7 @@ public class GachaLocationService implements GachaService, OnActivityResumeListe
 
 			state = State.Ready;
 			if (lastLocation == null) {
-				bus.post(new LastLocationEvent(new LocationServiceException("Getting last location is not available.")));
+				bus.post(new LastLocationEvent(new ServiceException("Getting last location is not available.")));
 			} else {
 				bus.post(new LastLocationEvent(lastLocation));
 			}
@@ -186,7 +183,7 @@ public class GachaLocationService implements GachaService, OnActivityResumeListe
 			Log.w(TAG, "Google api with LocationServices connection failed - " + result.toString());
 
 			state = State.Ready;
-			bus.post(new LastLocationEvent(new LocationServiceException(result.toString())));
+			bus.post(new LastLocationEvent(new ServiceException(result.toString())));
 		}
 	};
 
