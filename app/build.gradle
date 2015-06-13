@@ -22,6 +22,12 @@ android {
 	}
 }
 
+//sourceSets {
+//	integrationTest {
+//		java.srcDir file('src/integrationTest/java')
+//	}
+//}
+
 dependencies {
 	provided 'org.projectlombok:lombok:1.16.4'
 
@@ -32,8 +38,23 @@ dependencies {
 	compile 'com.google.guava:guava:18.0'
 	compile 'com.squareup:otto:1.3.7'
 	compile 'com.mcxiaoke.volley:library:1.0.16'
+	compile 'com.google.code.gson:gson:2.3.1'
 
 	testCompile 'junit:junit:4.12'
 	testCompile 'org.mockito:mockito-core:1.10.19'
 	androidTestCompile 'org.hamcrest:hamcrest-library:1.1'
 }
+
+//task integrationTest(type: Test, dependsOn: assemble) {
+//	testClassesDir = sourceSets.integrationTest.output.classesDir
+//
+//	android.sourceSets.main.java.srcDirs.each { dir ->
+//		def buildDir = dir.getAbsolutePath().split('/')
+//		buildDir =  (buildDir[0..(buildDir.length - 4)] + ['build', 'classes', 'debug']).join('/')
+//
+//		sourceSets.integrationTest.compileClasspath += files(buildDir)
+//		sourceSets.integrationTest.runtimeClasspath += files(buildDir)
+//	}
+//
+//	classpath = sourceSets.integrationTest.runtimeClasspath
+//}
