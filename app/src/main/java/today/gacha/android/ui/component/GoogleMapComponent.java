@@ -40,6 +40,14 @@ public class GoogleMapComponent {
 		map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 	}
 
+	public void addMarkerWithTitle(LatLng latLng, String title) {
+		Marker marker = map.addMarker(new MarkerOptions()
+				.position(latLng)
+				.title(title));
+
+		marker.showInfoWindow();
+	}
+
 	public void addMarker(Restaurant restaurant) {
 		Marker marker = map.addMarker(new MarkerOptions()
 				.position(new LatLng(restaurant.getLatitude(), restaurant.getLongitude()))
@@ -59,6 +67,8 @@ public class GoogleMapComponent {
 			public void onMapClick(LatLng latLng) {
 				Log.e(TAG, "lat: " + String.valueOf(latLng.latitude));
 				Log.e(TAG, "lng: " + String.valueOf(latLng.longitude));
+				//				addMarkerWithTitle(map.getProjection().getVisibleRegion().latLngBounds.northeast, "north east");
+				//				addMarkerWithTitle(map.getProjection().getVisibleRegion().latLngBounds.southwest, "south west");
 			}
 		});
 	}
