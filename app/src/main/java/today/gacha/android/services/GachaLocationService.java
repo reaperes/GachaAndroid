@@ -27,7 +27,7 @@ import static com.google.android.gms.common.api.GoogleApiClient.OnConnectionFail
 public class GachaLocationService implements GachaService, OnActivityResumeListener, OnActivityPausedListener {
 	private static final String TAG = LogUtils.makeTag(GachaLocationService.class);
 
-	static volatile GachaLocationService singleton = null;
+	private static volatile GachaLocationService singleton = null;
 	private final LocationManager locationManager;
 	private final GoogleApiClient googleApiClient;
 	private Bus bus;
