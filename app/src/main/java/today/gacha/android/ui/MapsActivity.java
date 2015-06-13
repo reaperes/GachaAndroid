@@ -99,33 +99,4 @@ public class MapsActivity extends GachaFragmentActivity {
 			}
 		}
 	}
-
-	/**************************************************
-	 * For debugging
-	 **************************************************/
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(0, 0, Menu.NONE, "addMarkerTest");
-		menu.add(0, 1, Menu.NONE, "requestTest");
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case 0:
-				Restaurant restaurant = Restaurant.builder()
-						.latitude(37.40208147037274d)
-						.longitude(127.10891090333462d)
-						.name("NHN NEXT")
-						.score(100)
-						.build();
-
-				mapComponent.addMarker(restaurant);
-				break;
-			case 1:
-				restaurantsService.requestRestaurants(0, 0, 0);
-		}
-		return false;
-	}
 }
