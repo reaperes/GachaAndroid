@@ -1,4 +1,4 @@
-package today.gacha.android.core;
+package today.gacha.android.core.service;
 
 /**
  * @author Namhoon

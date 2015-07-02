@@ -7,9 +7,9 @@ import com.squareup.otto.Bus;
 import lombok.Getter;
 import lombok.Setter;
 import today.gacha.android.GachaApplication;
-import today.gacha.android.core.GachaEvent;
-import today.gacha.android.core.GachaService;
-import today.gacha.android.core.ServiceException;
+import today.gacha.android.core.event.GachaEvent;
+import today.gacha.android.core.service.GachaService;
+import today.gacha.android.core.service.ServiceException;
 import today.gacha.android.domain.Restaurant;
 import today.gacha.android.utils.LogUtils;
 

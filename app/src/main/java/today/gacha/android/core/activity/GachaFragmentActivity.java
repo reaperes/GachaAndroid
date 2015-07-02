@@ -1,10 +1,11 @@
-package today.gacha.android.core;
+package today.gacha.android.core.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import com.squareup.otto.Bus;
 import today.gacha.android.GachaApplication;
+import today.gacha.android.core.service.*;
 import today.gacha.android.utils.LogUtils;
 
 import java.util.ArrayList;

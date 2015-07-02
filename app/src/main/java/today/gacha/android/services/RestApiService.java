@@ -9,7 +9,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import lombok.Getter;
-import today.gacha.android.core.GachaService;
+import today.gacha.android.core.service.GachaService;
 import today.gacha.android.utils.LogUtils;
 
 /**
