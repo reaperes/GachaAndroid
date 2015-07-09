@@ -3,6 +3,7 @@ package today.gacha.android.ui;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -25,7 +26,9 @@ import today.gacha.android.utils.LogUtils;
  * 2. Get user's last location.
  * 3. Get user's current location.
  */
-public class MapsActivity extends GachaFragmentActivity {
+public class MapsActivity extends GachaFragmentActivity  {
+
+    //implements OnMapReadyCallback
 
 	private static final String TAG = LogUtils.makeTag(MapsActivity.class);
 
@@ -43,7 +46,7 @@ public class MapsActivity extends GachaFragmentActivity {
 		addActivityLifeCycleListener(locationService);
 
 		GoogleMap googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
-		mapComponent = new GoogleMapComponent(googleMap);
+		mapComponent = new GoogleMapComponent(googleMap, this);
 	}
 
 	@Override
@@ -62,6 +65,7 @@ public class MapsActivity extends GachaFragmentActivity {
 			Log.d(TAG, "Last location data received successfully - " + event.getData());
 			Location location = event.getData();
 			mapComponent.animateToCamera(location);
+            mapComponent.addMarkerOfCurrentLocation(location);
 			restaurantsService.requestRestaurants(location.getLatitude(), location.getLongitude(), 999d);
 			return;
 		}
@@ -93,7 +97,7 @@ public class MapsActivity extends GachaFragmentActivity {
 		Log.d(TAG, "Restaurants data received - " + event.getData());
 		if (event.isSuccess()) {
 			for (Restaurant restaurant : event.getData()) {
-				mapComponent.addMarker(restaurant);
+				mapComponent.addRestaurantLocationMarker(restaurant);
 			}
 		}
 	}
