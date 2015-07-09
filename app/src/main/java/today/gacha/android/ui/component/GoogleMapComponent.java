@@ -53,13 +53,11 @@ public class GoogleMapComponent {
         map.addMarker(new MarkerOptions().position(correntLatLng).title("NOW"));
     }
 
-	public void addMarker(Restaurant restaurant) {
-		Marker marker = map.addMarker(new MarkerOptions()
-				.position(new LatLng(restaurant.getLatitude(), restaurant.getLongitude()))
+    // addMarker is Google Map Class Name. 'addMarker' rename 'addRestaurantLocationMarker'
+	public void addRestaurantLocationMarker(Restaurant restaurant) {
+		map.addMarker(new MarkerOptions().position(new LatLng(restaurant.getLatitude(), restaurant.getLongitude()))
 				.title(restaurant.getName())
 				.snippet("Score: " + String.valueOf(restaurant.getScore())));
-
-		marker.showInfoWindow();
 	}
 
 	public LatLng getDefaultLatLng() {

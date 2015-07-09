@@ -99,7 +99,7 @@ public class MapsActivity extends GachaFragmentActivity  {
 		Log.d(TAG, "Restaurants data received - " + event.getData());
 		if (event.isSuccess()) {
 			for (Restaurant restaurant : event.getData()) {
-				mapComponent.addMarker(restaurant);
+				mapComponent.addRestaurantLocationMarker(restaurant);
 			}
 		}
 	}
