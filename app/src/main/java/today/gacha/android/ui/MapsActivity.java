@@ -46,7 +46,7 @@ public class MapsActivity extends GachaFragmentActivity  {
 		addActivityLifeCycleListener(locationService);
 
 		GoogleMap googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
-		mapComponent = new GoogleMapComponent(googleMap);
+		mapComponent = new GoogleMapComponent(googleMap, this);
 	}
 
 	@Override

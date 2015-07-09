@@ -50,7 +50,7 @@ public class RestaurantsService implements GachaService {
 		return singleton;
 	}
 
-    // @TODO Volley -> OkHTTP or
+    // @TODO Volley -> OkHTTP
 	public void requestRestaurants(double latitude, double longitude, double radius) {
 		String url = String.format("/restaurants?latitude=%s&longitude=%s&radius=%s", latitude, longitude, radius);
         Log.e(TAG, url);
@@ -65,6 +65,7 @@ public class RestaurantsService implements GachaService {
 				new Response.ErrorListener() {
 					@Override
 					public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "Request restaurants failed.");
 						bus.post(new RestaurantsDataEvent(new ServiceException("Request restaurants failed.")));
 					}
 				});
