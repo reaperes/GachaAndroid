@@ -1,6 +1,8 @@
 package today.gacha.android.services;
 
 import android.content.Context;
+import android.util.Log;
+
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.squareup.otto.Bus;
@@ -48,8 +50,10 @@ public class RestaurantsService implements GachaService {
 		return singleton;
 	}
 
+    // @TODO Volley -> OkHTTP or
 	public void requestRestaurants(double latitude, double longitude, double radius) {
 		String url = String.format("/restaurants?latitude=%s&longitude=%s&radius=%s", latitude, longitude, radius);
+        Log.e(TAG, url);
 		restApiService.request(GET, url, ResponseRestaurantsDto.class,
 				new Response.Listener<ResponseRestaurantsDto>() {
 					@Override

@@ -58,8 +58,6 @@ public class MapsActivity extends GachaFragmentActivity  {
 
 	/**
 	 * @see today.gacha.android.services.GachaLocationService
-     * Error Get last location data.
-     * @TODO last location event check
 	 */
 	@Subscribe
 	public void onLastLocation(LastLocationEvent event) {

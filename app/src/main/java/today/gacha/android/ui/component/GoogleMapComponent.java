@@ -74,8 +74,8 @@ public class GoogleMapComponent {
 			public void onMapClick(LatLng latLng) {
 				Log.e(TAG, "lat: " + String.valueOf(latLng.latitude));
 				Log.e(TAG, "lng: " + String.valueOf(latLng.longitude));
-				//				addMarkerWithTitle(map.getProjection().getVisibleRegion().latLngBounds.northeast, "north east");
-				//				addMarkerWithTitle(map.getProjection().getVisibleRegion().latLngBounds.southwest, "south west");
+//				addMarkerWithTitle(map.getProjection().getVisibleRegion().latLngBounds.northeast, "north east");
+//				addMarkerWithTitle(map.getProjection().getVisibleRegion().latLngBounds.southwest, "south west");
 			}
 		});
 	}
