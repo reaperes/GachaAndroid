@@ -65,7 +65,7 @@ public class MapsActivity extends GachaFragmentActivity  {
 			Log.d(TAG, "Last location data received successfully - " + event.getData());
 			Location location = event.getData();
 			mapComponent.animateToCamera(location);
-            mapComponent.addMarkerOfCorrentLocation(location);
+            mapComponent.addMarkerOfCurrentLocation(location);
 			restaurantsService.requestRestaurants(location.getLatitude(), location.getLongitude(), 999d);
 			return;
 		}

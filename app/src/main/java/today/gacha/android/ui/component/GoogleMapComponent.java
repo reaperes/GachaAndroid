@@ -48,9 +48,9 @@ public class GoogleMapComponent {
 		marker.showInfoWindow();
 	}
 
-    public void addMarkerOfCorrentLocation(Location location){
-        LatLng correntLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-        map.addMarker(new MarkerOptions().position(correntLatLng).title("NOW"));
+    public void addMarkerOfCurrentLocation(Location location){
+        LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+        map.addMarker(new MarkerOptions().position(currentLatLng).title("NOW"));
     }
 
     // addMarker is Google Map Class Name. 'addMarker' rename 'addRestaurantLocationMarker'
