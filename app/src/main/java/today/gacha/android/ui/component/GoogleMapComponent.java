@@ -48,6 +48,11 @@ public class GoogleMapComponent {
 		marker.showInfoWindow();
 	}
 
+    public void addMarkerOfCorrentLocation(Location location){
+        LatLng correntLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+        map.addMarker(new MarkerOptions().position(correntLatLng).title("NOW"));
+    }
+
 	public void addMarker(Restaurant restaurant) {
 		Marker marker = map.addMarker(new MarkerOptions()
 				.position(new LatLng(restaurant.getLatitude(), restaurant.getLongitude()))

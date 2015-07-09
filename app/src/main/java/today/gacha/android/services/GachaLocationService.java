@@ -219,7 +219,6 @@ public class GachaLocationService implements GachaService, OnActivityResumeListe
 		LastLocationEvent(Throwable t) {
 			super(t);
 		}
-
 		LastLocationEvent(Location location) {
 			super(location);
 		}

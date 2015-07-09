@@ -3,6 +3,7 @@ package today.gacha.android.ui;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -25,7 +26,9 @@ import today.gacha.android.utils.LogUtils;
  * 2. Get user's last location.
  * 3. Get user's current location.
  */
-public class MapsActivity extends GachaFragmentActivity {
+public class MapsActivity extends GachaFragmentActivity  {
+
+    //implements OnMapReadyCallback
 
 	private static final String TAG = LogUtils.makeTag(MapsActivity.class);
 
@@ -55,6 +58,8 @@ public class MapsActivity extends GachaFragmentActivity {
 
 	/**
 	 * @see today.gacha.android.services.GachaLocationService
+     * Error Get last location data.
+     * @TODO last location event check
 	 */
 	@Subscribe
 	public void onLastLocation(LastLocationEvent event) {
@@ -62,6 +67,7 @@ public class MapsActivity extends GachaFragmentActivity {
 			Log.d(TAG, "Last location data received successfully - " + event.getData());
 			Location location = event.getData();
 			mapComponent.animateToCamera(location);
+            mapComponent.addMarkerOfCorrentLocation(location);
 			restaurantsService.requestRestaurants(location.getLatitude(), location.getLongitude(), 999d);
 			return;
 		}
