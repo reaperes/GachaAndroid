@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">gacha</string>
+    <string name="facebook_app_id">1643544722596880</string>
+    <string name="serverUrl">http://gacha.co.kr/</string>
+</resources>
