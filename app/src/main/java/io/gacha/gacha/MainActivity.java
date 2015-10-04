@@ -9,6 +9,7 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.Profile;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.loopj.android.http.AsyncHttpClient;
@@ -23,15 +24,17 @@ import java.net.URL;
 
 import cz.msebera.android.httpclient.Header;
 
+import static io.gacha.gacha.R.color.facebook200;
+
 public class MainActivity extends AppCompatActivity {
 
-    private TextView textView;
+    private TextView userName;
+    private TextView statusCodeText;
     private LoginButton loginButton;
 
     private CallbackManager callbackManager;
 
     private static AsyncHttpClient client = new AsyncHttpClient();
-    private AsyncHttpResponseHandler responseHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +43,13 @@ public class MainActivity extends AppCompatActivity {
         callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.activity_main);
 
-        textView = (TextView)findViewById(R.id.text);
+        userName = (TextView)findViewById(R.id.user_name);
+        statusCodeText = (TextView)findViewById(R.id.status_code);
+
         loginButton = (LoginButton)findViewById(R.id.login_button);
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+
             @Override
             public void onSuccess(LoginResult loginResult) {
 
@@ -55,12 +61,15 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                         String statusCodeStr = String.valueOf(statusCode);
-                        textView.setText(statusCodeStr);
+                        statusCodeText.setText(statusCodeStr);
+                        statusCodeText.setBackgroundColor(0x8022ff00);
                     }
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                        textView.setText(statusCode);
+                        String statusCodeStr = String.valueOf(statusCode);
+                        statusCodeText.setText(statusCodeStr);
+                        statusCodeText.setBackgroundColor(0x80ff0000);
                     }
                 });
 
@@ -68,17 +77,17 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCancel() {
-                textView.setText("Login attempt canceled.");
+                statusCodeText.setText("Login attempt canceled.");
+                statusCodeText.setBackgroundColor(0x8022ff00);
             }
 
             @Override
             public void onError(FacebookException e) {
-                textView.setText("Login attempt failed.");
+                statusCodeText.setText("Login attempt failed.");
+                statusCodeText.setBackgroundColor(0x80ff0000);
             }
         });
     }
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
